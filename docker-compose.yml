@@ -44,6 +44,10 @@ services:
     environment:
       RAILS_ENV: development
       RAILS_LOG_TO_STDOUT: "true"
+    entrypoint: ["bash", "bin/docker-entrypoint.sh"]
+    command: ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+    volumes:
+      - .:/app
 
 volumes:
   postgres_data:
