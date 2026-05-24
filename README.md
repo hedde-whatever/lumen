@@ -11,7 +11,7 @@ You don't need to know Ruby or Rails. You just need Docker.
 ### Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
-- A `.env` file (get this from Oliver — do not commit it)
+- A `.env` file (get this from someone in the team — do not commit it)
 
 ### First-time setup
 
@@ -20,7 +20,7 @@ You don't need to know Ruby or Rails. You just need Docker.
 git clone git@github.com:Djursing/lumen.git
 cd lumen
 
-# 2. Place the .env file Oliver sent you in the root of the project
+# 2. Place the .env file sent you in the root of the project
 #    It should sit next to docker-compose.yml
 
 # 3. Build and start everything
