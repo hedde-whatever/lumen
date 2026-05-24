@@ -45,6 +45,21 @@ curl http://localhost:3000/up
 # → "OK"
 ```
 
+### Demo accounts
+
+The database is pre-seeded with two accounts and several concerts each. Use these to log in straight away:
+
+| Email | Password |
+|-------|----------|
+| alice@lumen.dev | password123 |
+| bob@lumen.dev | password123 |
+
+```bash
+curl -s -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@lumen.dev","password":"password123"}' | jq .token
+```
+
 ### Stopping
 
 ```bash

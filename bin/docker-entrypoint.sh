@@ -7,5 +7,6 @@ until pg_isready -h "$DB_HOST" -U "$DB_USERNAME" -d postgres -q; do
 done
 
 bundle exec rails db:prepare
+bundle exec rails db:seed
 
 exec "$@"
