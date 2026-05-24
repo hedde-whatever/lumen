@@ -18,7 +18,13 @@ RSpec.describe "Media", type: :request do
       security [ bearer: [] ]
 
       response "200", "media listed" do
-        schema type: :array, items: { "$ref" => "#/components/schemas/Medium" }
+        schema type: :object,
+               required: [ "items", "limit", "remaining" ],
+               properties: {
+                 items:     { type: :array, items: { "$ref" => "#/components/schemas/Medium" } },
+                 limit:     { type: :integer, example: 10 },
+                 remaining: { type: :integer, example: 8 }
+               }
         before { create_list(:medium, 2, user: user, event: event) }
         let(:event_id) { event.id }
         run_test!

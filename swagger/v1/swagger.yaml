@@ -421,9 +421,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/Medium"
+                type: object
+                required:
+                  - items
+                  - limit
+                  - remaining
+                properties:
+                  items:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/Medium"
+                  limit:
+                    type: integer
+                    example: 10
+                  remaining:
+                    type: integer
+                    example: 8
         '404':
           description: event not found
           content:

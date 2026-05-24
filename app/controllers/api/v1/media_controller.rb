@@ -3,13 +3,16 @@ class Api::V1::MediaController < ApplicationController
   before_action :set_event
   before_action :set_medium, only: [ :destroy ]
 
+  MEDIA_LIMIT = 10
+
   def index
-    render json: @event.media.map { |m| medium_json(m) }
+    items = @event.media.map { |m| medium_json(m) }
+    render json: { items: items, limit: MEDIA_LIMIT, remaining: MEDIA_LIMIT - items.count }
   end
 
   def create
-    if @event.media.count >= 10
-      render json: { error: "Event has reached the 10 photo limit" }, status: :unprocessable_entity
+    if @event.media.count >= MEDIA_LIMIT
+      render json: { error: "Event has reached the #{MEDIA_LIMIT} photo limit" }, status: :unprocessable_entity
       return
     end
 
