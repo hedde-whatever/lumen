@@ -67,6 +67,19 @@ RSpec.describe "Media", type: :request do
         end
         run_test!
       end
+
+      response "422", "photo limit reached" do
+        schema "$ref" => "#/components/schemas/Error"
+        before { create_list(:medium, 10, user: user, event: event) }
+        let(:event_id) { event.id }
+        let(:file) do
+          fixture_file_upload(
+            Rails.root.join("spec/fixtures/files/photo.jpg"),
+            "image/jpeg"
+          )
+        end
+        run_test!
+      end
     end
   end
 

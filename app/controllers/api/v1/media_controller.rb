@@ -8,6 +8,11 @@ class Api::V1::MediaController < ApplicationController
   end
 
   def create
+    if @event.media.count >= 10
+      render json: { error: "Event has reached the 10 photo limit" }, status: :unprocessable_entity
+      return
+    end
+
     file = params.require(:file)
     key  = S3UploadService.upload(
       file:     file,

@@ -462,6 +462,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Error"
+        '422':
+          description: photo limit reached
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
   "/api/v1/events/{event_id}/media/{id}":
     parameters:
       - name: event_id
