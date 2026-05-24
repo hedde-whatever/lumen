@@ -47,7 +47,7 @@ curl http://localhost:3000/up
 
 ### Demo accounts
 
-The database is pre-seeded with two accounts and several concerts each. Use these to log in straight away:
+The database is pre-seeded with two accounts, several concerts each, and 2 photos per concert already uploaded to LocalStack. Use these to log in straight away:
 
 | Email | Password |
 |-------|----------|
@@ -112,7 +112,7 @@ When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in
 }
 ```
 
-The `url` field is a time-limited link (1 hour) that points to `localhost:4566`. You can load it directly in an `<Image>` tag or `fetch()` call from your Expo app — no extra configuration needed.
+The `url` field is a time-limited link (1 hour) that points to `localhost:4567`. You can load it directly in an `<Image>` tag or `fetch()` call from your Expo app — no extra configuration needed.
 
 > **Note:** LocalStack data is stored in a Docker volume. It persists across restarts but is wiped when you run `docker compose down -v`.
 

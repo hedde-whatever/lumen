@@ -1,5 +1,9 @@
 # Idempotent — safe to run on every container start.
-# Creates two demo users with known credentials and a handful of concerts each.
+# Creates two demo users with known credentials, a handful of concerts each, and 2 seed images per concert.
+
+SeedFile = Struct.new(:path, :original_filename, :content_type) do
+  def read = File.binread(path)
+end
 
 puts "Seeding demo users..."
 
@@ -105,6 +109,20 @@ concerts = [
 concerts.each do |attrs|
   Event.find_or_create_by!(user: attrs[:user], name: attrs[:name], date: attrs[:date]) do |e|
     e.assign_attributes(attrs.except(:user))
+  end
+end
+
+puts "Seeding media..."
+
+image_path = Rails.root.join("db/seeds/images/concert.jpg")
+
+Event.all.each do |event|
+  next if event.media.exists?
+
+  2.times do |i|
+    file = SeedFile.new(image_path, "photo#{i + 1}.jpg", "image/jpeg")
+    key  = S3UploadService.upload(file: file, user_id: event.user_id, event_id: event.id)
+    event.media.create!(user: event.user, path: key)
   end
 end
 
