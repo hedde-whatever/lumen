@@ -1,6 +1,6 @@
 class Api::V1::EventsController < ApplicationController
   include Authenticatable
-  before_action :set_event, only: [:show, :update, :destroy]
+  before_action :set_event, only: [ :show, :update, :destroy ]
 
   def index
     events = @current_user.events
@@ -8,11 +8,11 @@ class Api::V1::EventsController < ApplicationController
                           .includes(:media)
                           .page(params[:page])
                           .per(params[:per_page] || 20)
-    render json: events.as_json(include: { media: { only: [:id, :path, :created_at] } })
+    render json: events.as_json(include: { media: { only: [ :id, :path, :created_at ] } })
   end
 
   def show
-    render json: @event.as_json(include: { media: { only: [:id, :path, :created_at] } })
+    render json: @event.as_json(include: { media: { only: [ :id, :path, :created_at ] } })
   end
 
   def create

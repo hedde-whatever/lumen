@@ -11,7 +11,7 @@ class JwtService
   end
 
   def self.decode(token)
-    decoded = JWT.decode(token, secret, true, algorithms: [ALGORITHM])
+    decoded = JWT.decode(token, secret, true, algorithms: [ ALGORITHM ])
     decoded.first.with_indifferent_access
   rescue JWT::DecodeError => e
     raise Errors::InvalidToken, e.message

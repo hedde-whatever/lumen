@@ -15,7 +15,7 @@ RSpec.describe "Media", type: :request do
     get "List media for an event" do
       tags     "Media"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       response "200", "media listed" do
         schema type: :array, items: { "$ref" => "#/components/schemas/Medium" }
@@ -35,7 +35,7 @@ RSpec.describe "Media", type: :request do
       tags     "Media"
       consumes "multipart/form-data"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       parameter name: :file, in: :formData, type: :file, required: true,
                 description: "Image or video file to upload"
@@ -76,7 +76,7 @@ RSpec.describe "Media", type: :request do
 
     delete "Delete a media record" do
       tags     "Media"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       before { allow(S3UploadService).to receive(:delete) }
 

@@ -1,7 +1,7 @@
 class Api::V1::MediaController < ApplicationController
   include Authenticatable
   before_action :set_event
-  before_action :set_medium, only: [:destroy]
+  before_action :set_medium, only: [ :destroy ]
 
   def index
     render json: @event.media.map { |m| medium_json(m) }
@@ -35,6 +35,6 @@ class Api::V1::MediaController < ApplicationController
   end
 
   def medium_json(medium)
-    medium.as_json(only: [:id, :path, :created_at]).merge(url: medium.presigned_url)
+    medium.as_json(only: [ :id, :path, :created_at ]).merge(url: medium.presigned_url)
   end
 end

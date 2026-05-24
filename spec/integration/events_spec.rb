@@ -8,7 +8,7 @@ RSpec.describe "Events", type: :request do
     get "List events" do
       tags     "Events"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       parameter name: :page,     in: :query, type: :integer, required: false, description: "Page number (default: 1)"
       parameter name: :per_page, in: :query, type: :integer, required: false, description: "Records per page (default: 20)"
@@ -30,11 +30,11 @@ RSpec.describe "Events", type: :request do
       tags     "Events"
       consumes "application/json"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       parameter name: :body, in: :body, required: true, schema: {
         type: :object,
-        required: [:name],
+        required: [ :name ],
         properties: {
           name:         { type: :string,  example: "Radiohead at Roskilde" },
           date:         { type: :string,  format: :date, example: "2026-07-04" },
@@ -80,7 +80,7 @@ RSpec.describe "Events", type: :request do
     get "Get an event" do
       tags     "Events"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       response "200", "event found" do
         schema "$ref" => "#/components/schemas/Event"
@@ -100,7 +100,7 @@ RSpec.describe "Events", type: :request do
       tags     "Events"
       consumes "application/json"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       parameter name: :body, in: :body, required: true, schema: {
         type: :object,
@@ -132,7 +132,7 @@ RSpec.describe "Events", type: :request do
 
     delete "Delete an event" do
       tags     "Events"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       response "204", "event deleted" do
         let!(:event) { create(:event, user: user) }

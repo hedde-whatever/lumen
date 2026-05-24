@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  mount Rswag::Api::Engine => '/api-docs'
-  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => "/api-docs"
+  mount Rswag::Ui::Engine => "/api-docs"
   get "up" => "rails/health#show", as: :rails_health_check
 
   namespace :api do
@@ -9,8 +9,8 @@ Rails.application.routes.draw do
       post "auth/login",    to: "auth#login"
       get  "auth/me",       to: "auth#me"
 
-      resources :events, only: [:index, :show, :create, :update, :destroy] do
-        resources :media, only: [:index, :create, :destroy]
+      resources :events, only: [ :index, :show, :create, :update, :destroy ] do
+        resources :media, only: [ :index, :create, :destroy ]
       end
     end
   end

@@ -9,7 +9,7 @@ RSpec.describe "Auth", type: :request do
 
       parameter name: :body, in: :body, required: true, schema: {
         type: :object,
-        required: [:name, :email, :password, :password_confirmation],
+        required: [ :name, :email, :password, :password_confirmation ],
         properties: {
           name:                  { type: :string, example: "Oliver" },
           email:                 { type: :string, format: :email, example: "oliver@example.com" },
@@ -43,7 +43,7 @@ RSpec.describe "Auth", type: :request do
 
       parameter name: :body, in: :body, required: true, schema: {
         type: :object,
-        required: [:email, :password],
+        required: [ :email, :password ],
         properties: {
           email:    { type: :string, format: :email, example: "oliver@example.com" },
           password: { type: :string, format: :password, example: "secret123" }
@@ -73,7 +73,7 @@ RSpec.describe "Auth", type: :request do
     get "Get current user" do
       tags     "Auth"
       produces "application/json"
-      security [bearer: []]
+      security [ bearer: [] ]
 
       response "200", "current user" do
         schema type: :object, properties: {

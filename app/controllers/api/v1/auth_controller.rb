@@ -1,6 +1,6 @@
 class Api::V1::AuthController < ApplicationController
   include Authenticatable
-  skip_before_action :authenticate_request!, only: [:register, :login]
+  skip_before_action :authenticate_request!, only: [ :register, :login ]
 
   def register
     user = User.new(register_params)
@@ -33,6 +33,6 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def user_json(user)
-    user.as_json(only: [:id, :name, :email, :created_at])
+    user.as_json(only: [ :id, :name, :email, :created_at ])
   end
 end
