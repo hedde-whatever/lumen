@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:16.9-alpine3.21
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB:       "${DB_NAME}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:4.4.0
+    restart: unless-stopped
+    environment:
+      SERVICES: "s3"
+      DEFAULT_REGION: "${AWS_REGION}"
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - ./bin/localstack-init.sh:/etc/localstack/init/ready.d/init-s3.sh
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      RAILS_ENV: development
+      RAILS_LOG_TO_STDOUT: "true"
+
+volumes:
+  postgres_data:
+  localstack_data:
