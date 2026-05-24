@@ -124,7 +124,7 @@ Fetching all media for an event via `GET /api/v1/events/:id/media` returns an en
 
 Each event can hold a maximum of **10 photos**. Uploading when the limit is reached returns `422`.
 
-The `url` field is a time-limited link (7 days) that points to `localhost:4567`. You can load it directly in an `<Image>` tag or `fetch()` call from your Expo app — no extra configuration needed.
+The `url` field is a time-limited link (7 days) that points to `localhost:4567`. You can load it directly in an `<Image>` tag or `fetch()` call — no extra configuration needed.
 
 > **Note:** LocalStack data is stored in a Docker volume. It persists across restarts but is wiped when you run `docker compose down -v`.
 
