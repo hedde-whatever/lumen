@@ -22,7 +22,7 @@ services:
       DEFAULT_REGION: "${AWS_REGION}"
       S3_BUCKET_NAME: "${S3_BUCKET_NAME}"
     ports:
-      - "4566:4566"
+      - "4567:4566"
     volumes:
       - localstack_data:/var/lib/localstack
       - ./bin/localstack-init.sh:/etc/localstack/init/ready.d/init-s3.sh

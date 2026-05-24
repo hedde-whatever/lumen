@@ -35,7 +35,7 @@ That's it. The first build takes a few minutes as it installs dependencies. On s
 |------------|----------------------------------|---------------------------------|
 | Rails API  | http://localhost:3000            | The API                         |
 | Swagger UI | http://localhost:3000/api-docs   | Interactive API docs             |
-| LocalStack | http://localhost:4566            | Local S3 (media file storage)   |
+| LocalStack | http://localhost:4567            | Local S3 (media file storage)   |
 | Postgres   | localhost:5432                   | Database (internal use only)    |
 
 ### Verifying it works
@@ -107,7 +107,7 @@ When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in
 {
   "id": 1,
   "path": "uploads/users/1/events/3/uuid-photo.jpg",
-  "url": "http://localhost:4566/lumen-media/uploads/users/1/events/3/uuid-photo.jpg?...",
+  "url": "http://localhost:4567/lumen-media/uploads/users/1/events/3/uuid-photo.jpg?...",
   "created_at": "2026-05-24T12:00:00.000Z"
 }
 ```

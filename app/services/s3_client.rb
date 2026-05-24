@@ -30,10 +30,12 @@ class S3Client
   end
 
   # Presigned URLs generated against localstack:4566 are unreachable from the
-  # host machine. Rewrite the host so browsers and the frontend can fetch them.
+  # host machine. Rewrite to S3_PUBLIC_ENDPOINT so browsers and the frontend
+  # can fetch them on whatever host port LocalStack is mapped to.
   def self.rewrite_localstack_host(url)
     return url unless Rails.env.development? && url.include?("localstack")
 
-    url.sub("http://localstack:4566", "http://localhost:4566")
+    public_endpoint = ENV.fetch("S3_PUBLIC_ENDPOINT", "http://localhost:4567")
+    url.sub("http://localstack:4566", public_endpoint)
   end
 end
