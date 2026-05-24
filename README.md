@@ -101,7 +101,7 @@ All endpoints (except `/up`) live under `/api/v1/`.
 
 In local development, file uploads (concert photos/videos) go to **LocalStack** — a local emulator of AWS S3. There is no real S3 bucket involved; everything stays on your machine.
 
-When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in LocalStack and returns a presigned URL you can use to fetch it:
+When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in LocalStack and returns the new media record:
 
 ```json
 {
@@ -112,7 +112,19 @@ When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in
 }
 ```
 
-The `url` field is a time-limited link (1 hour) that points to `localhost:4567`. You can load it directly in an `<Image>` tag or `fetch()` call from your Expo app — no extra configuration needed.
+Fetching all media for an event via `GET /api/v1/events/:id/media` returns an envelope with the limit built in — use this to decide whether to show the upload button:
+
+```json
+{
+  "items": [ { "id": 1, "path": "...", "url": "...", "created_at": "..." } ],
+  "limit": 10,
+  "remaining": 9
+}
+```
+
+Each event can hold a maximum of **10 photos**. Uploading when the limit is reached returns `422`.
+
+The `url` field is a time-limited link (7 days) that points to `localhost:4567`. You can load it directly in an `<Image>` tag or `fetch()` call from your Expo app — no extra configuration needed.
 
 > **Note:** LocalStack data is stored in a Docker volume. It persists across restarts but is wiped when you run `docker compose down -v`.
 
@@ -126,6 +138,12 @@ docker compose up --build   # rebuild picks up any new gems or migrations
 ```
 
 The entrypoint automatically runs database migrations on startup, so you never need to run them manually.
+
+---
+
+## Live code reloading
+
+The app container mounts the source code directly from your machine. If you're making backend changes yourself, edits to `.rb` files are picked up on the next request — no restart or rebuild required.
 
 ---
 
