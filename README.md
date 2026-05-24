@@ -97,6 +97,27 @@ All endpoints (except `/up`) live under `/api/v1/`.
 
 ---
 
+## Media uploads and LocalStack
+
+In local development, file uploads (concert photos/videos) go to **LocalStack** — a local emulator of AWS S3. There is no real S3 bucket involved; everything stays on your machine.
+
+When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in LocalStack and returns a presigned URL you can use to fetch it:
+
+```json
+{
+  "id": 1,
+  "path": "uploads/users/1/events/3/uuid-photo.jpg",
+  "url": "http://localhost:4566/lumen-media/uploads/users/1/events/3/uuid-photo.jpg?...",
+  "created_at": "2026-05-24T12:00:00.000Z"
+}
+```
+
+The `url` field is a time-limited link (1 hour) that points to `localhost:4566`. You can load it directly in an `<Image>` tag or `fetch()` call from your Expo app — no extra configuration needed.
+
+> **Note:** LocalStack data is stored in a Docker volume. It persists across restarts but is wiped when you run `docker compose down -v`.
+
+---
+
 ## Pulling in new changes
 
 ```bash

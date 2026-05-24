@@ -20,6 +20,7 @@ services:
     environment:
       SERVICES: "s3"
       DEFAULT_REGION: "${AWS_REGION}"
+      S3_BUCKET_NAME: "${S3_BUCKET_NAME}"
     ports:
       - "4566:4566"
     volumes:
