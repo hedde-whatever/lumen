@@ -1,0 +1,491 @@
+---
+openapi: 3.0.1
+info:
+  title: Lumen API
+  description: Concert-logging API — Strava for music
+  version: v1
+servers:
+  - url: http://localhost:3000
+    description: Local dev
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Obtain a token from POST /api/v1/auth/login
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        date:
+          type: string
+          format: date
+          nullable: true
+        country_name:
+          type: string
+          nullable: true
+        country_code:
+          type: string
+          nullable: true
+        region_name:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        full_address:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        feature_type:
+          type: string
+          nullable: true
+        lat:
+          type: number
+          nullable: true
+        lng:
+          type: number
+          nullable: true
+        note:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Medium:
+      type: object
+      properties:
+        id:
+          type: integer
+        path:
+          type: string
+          description: S3 object key
+        url:
+          type: string
+          description: Presigned S3 URL (expires in 1 hour)
+        created_at:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+    Errors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+paths:
+  "/api/v1/auth/register":
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - password_confirmation
+              properties:
+                name:
+                  type: string
+                  example: Oliver
+                email:
+                  type: string
+                  format: email
+                  example: oliver@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secret123
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: secret123
+      responses:
+        '201':
+          description: user created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    "$ref": "#/components/schemas/User"
+        '422':
+          description: validation failed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Errors"
+  "/api/v1/auth/login":
+    post:
+      summary: Log in
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: oliver@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secret123
+      responses:
+        '200':
+          description: login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    "$ref": "#/components/schemas/User"
+        '401':
+          description: invalid credentials
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/auth/me":
+    get:
+      summary: Get current user
+      tags:
+        - Auth
+      security:
+        - bearer: []
+      responses:
+        '200':
+          description: current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    "$ref": "#/components/schemas/User"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/events":
+    get:
+      summary: List events
+      tags:
+        - Events
+      security:
+        - bearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: "Page number (default: 1)"
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          required: false
+          description: "Records per page (default: 20)"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: events listed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Event"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    post:
+      summary: Create an event
+      tags:
+        - Events
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Radiohead at Roskilde
+                date:
+                  type: string
+                  format: date
+                  example: '2026-07-04'
+                country_name:
+                  type: string
+                  example: Denmark
+                country_code:
+                  type: string
+                  example: DK
+                region_name:
+                  type: string
+                  example: Zealand
+                city:
+                  type: string
+                  example: Roskilde
+                full_address:
+                  type: string
+                  example: Roskilde Festival, Denmark
+                address:
+                  type: string
+                  example: Roskilde Festival
+                feature_type:
+                  type: string
+                  example: venue
+                lat:
+                  type: number
+                  example: 55.647
+                lng:
+                  type: number
+                  example: 12.0827
+                note:
+                  type: string
+                  example: "Amazing show, front row!"
+      responses:
+        '201':
+          description: event created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Event"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '422':
+          description: validation failed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Errors"
+  "/api/v1/events/{id}":
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get an event
+      tags:
+        - Events
+      security:
+        - bearer: []
+      responses:
+        '200':
+          description: event found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Event"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Update an event
+      tags:
+        - Events
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                note:
+                  type: string
+                city:
+                  type: string
+                lat:
+                  type: number
+                lng:
+                  type: number
+      responses:
+        '200':
+          description: event updated
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Event"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    delete:
+      summary: Delete an event
+      tags:
+        - Events
+      security:
+        - bearer: []
+      responses:
+        '204':
+          description: event deleted
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/events/{event_id}/media":
+    parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: List media for an event
+      tags:
+        - Media
+      security:
+        - bearer: []
+      responses:
+        '200':
+          description: media listed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Medium"
+        '404':
+          description: event not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    post:
+      summary: Upload media to an event
+      tags:
+        - Media
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Image or video file to upload
+      responses:
+        '201':
+          description: media uploaded
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Medium"
+        '404':
+          description: event not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/events/{event_id}/media/{id}":
+    parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    delete:
+      summary: Delete a media record
+      tags:
+        - Media
+      security:
+        - bearer: []
+      responses:
+        '204':
+          description: media deleted
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"

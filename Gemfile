@@ -11,6 +11,8 @@ gem "aws-sdk-s3",   "1.224.0"
 gem "dotenv-rails", "3.2.0"
 gem "kaminari",     "1.2.2"
 gem "bootsnap",     "1.24.5", require: false
+gem "rswag-api",    "2.17.0"
+gem "rswag-ui",     "2.17.0"
 
 gem "tzinfo-data", platforms: %i[windows jruby]
 
@@ -19,6 +21,7 @@ group :development, :test do
   gem "rspec-rails",       "8.0.4"
   gem "factory_bot_rails", "6.5.1"
   gem "faker",             "3.8.0"
+  gem "rswag-specs",       "2.17.0"
 end
 
 group :test do
