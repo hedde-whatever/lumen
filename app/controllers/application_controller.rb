@@ -4,11 +4,11 @@ class ApplicationController < ActionController::API
 
   private
 
-  def render_not_found(e)
-    render json: { error: e.message }, status: :not_found
+  def render_not_found
+    render json: { error: "Not found" }, status: :not_found
   end
 
-  def render_unauthorized(e)
-    render json: { error: e.message }, status: :unauthorized
+  def render_unauthorized
+    render json: { error: "Unauthorized" }, status: :unauthorized
   end
 end
