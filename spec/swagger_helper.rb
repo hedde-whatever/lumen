@@ -12,7 +12,7 @@ RSpec.configure do |config|
         description: "Concert-logging API — Strava for music"
       },
       servers: [
-        { url: "http://localhost:3000", description: "Local dev" }
+        { url: "/", description: "Local dev" }
       ],
       components: {
         securitySchemes: {
@@ -58,7 +58,7 @@ RSpec.configure do |config|
             properties: {
               id:         { type: :integer },
               path:       { type: :string, description: "S3 object key" },
-              url:        { type: :string, description: "Presigned S3 URL (expires in 1 hour)" },
+              url:        { type: :string, description: "Presigned S3 URL (expires in 7 days)" },
               created_at: { type: :string, format: :"date-time" }
             }
           },
