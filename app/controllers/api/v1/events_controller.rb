@@ -7,7 +7,7 @@ class Api::V1::EventsController < ApplicationController
                           .chronological
                           .includes(:media)
                           .page(params[:page])
-                          .per(params[:per_page] || 20)
+                          .per(params[:per_page] || 50)
     render json: events.as_json(include: { media: { only: [ :id, :path, :created_at ] } })
   end
 
