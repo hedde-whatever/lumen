@@ -4,7 +4,7 @@ class Medium < ApplicationRecord
 
   validates :path, presence: true
 
-  def presigned_url(expires_in: 604800)
+  def presigned_url(expires_in: 518400)
     S3Client.presigned_url(:get_object,
       bucket:     ENV.fetch("S3_BUCKET_NAME"),
       key:        path,
