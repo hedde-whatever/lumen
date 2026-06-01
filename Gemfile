@@ -16,6 +16,10 @@ gem "rswag-ui",     "2.17.0"
 
 gem "tzinfo-data", platforms: %i[windows jruby]
 
+group :development do
+  gem "solargraph", "0.59.2", require: false
+end
+
 group :development, :test do
   gem "debug",                  platforms: %i[mri windows], require: "debug/prelude"
   gem "rspec-rails",            "8.0.4"
