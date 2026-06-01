@@ -15,10 +15,10 @@ RSpec.describe "Auth", type: :request do
         type: :object,
         required: [ :name, :email, :password, :password_confirmation ],
         properties: {
-          name:                  { type: :string, example: "Oliver" },
-          email:                 { type: :string, format: :email, example: "oliver@example.com" },
-          password:              { type: :string, format: :password, example: "secret123" },
-          password_confirmation: { type: :string, format: :password, example: "secret123" }
+          name:                  { type: :string, example: "Alice" },
+          email:                 { type: :string, format: :email, example: "new@lumen.dev" },
+          password:              { type: :string, format: :password, example: "password123" },
+          password_confirmation: { type: :string, format: :password, example: "password123" }
         }
       }
 
@@ -46,8 +46,8 @@ RSpec.describe "Auth", type: :request do
         type: :object,
         required: [ :email, :password ],
         properties: {
-          email:    { type: :string, format: :email, example: "oliver@example.com" },
-          password: { type: :string, format: :password, example: "secret123" }
+          email:    { type: :string, format: :email, example: "alice@lumen.dev" },
+          password: { type: :string, format: :password, example: "password123" }
         }
       }
 

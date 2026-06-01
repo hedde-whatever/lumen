@@ -132,19 +132,19 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Oliver
+                  example: Alice
                 email:
                   type: string
                   format: email
-                  example: oliver@example.com
+                  example: new@lumen.dev
                 password:
                   type: string
                   format: password
-                  example: secret123
+                  example: password123
                 password_confirmation:
                   type: string
                   format: password
-                  example: secret123
+                  example: password123
       responses:
         '201':
           description: user created
@@ -176,11 +176,11 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: oliver@example.com
+                  example: alice@lumen.dev
                 password:
                   type: string
                   format: password
-                  example: secret123
+                  example: password123
       responses:
         '200':
           description: login successful
