@@ -1,8 +1,9 @@
 class User < ApplicationRecord
   has_secure_password
 
-  has_many :events, dependent: :destroy
-  has_many :media,  dependent: :destroy
+  has_many :events,         dependent: :destroy
+  has_many :media,          dependent: :destroy
+  has_many :refresh_tokens, dependent: :destroy
 
   validates :name,  presence: true
   validates :email, presence: true,
