@@ -16,9 +16,14 @@ class Api::V1::MediaController < ApplicationController
       return
     end
 
-    file   = params.require(:file)
+    file = params.require(:file)
+    unless Medium::ALLOWED_CONTENT_TYPES.include?(file.content_type)
+      render json: { errors: [ "Photo must be a JPEG, PNG, WebP, or GIF" ] }, status: :unprocessable_entity
+      return
+    end
+
     medium = @event.media.build(user: @current_user)
-    medium.photo.attach(file)
+    medium.photo.attach(ImageNormalizer.call(file))
 
     if medium.save
       render json: medium_json(medium), status: :created
