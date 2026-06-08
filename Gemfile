@@ -9,7 +9,7 @@ gem "clerk-sdk-ruby", "5.1.3", require: "clerk"
 gem "aws-sdk-s3",   "1.224.0"
 gem "dotenv-rails", "3.2.0"
 gem "kaminari",     "1.2.2"
-gem "bootsnap",     "1.24.5", require: false
+gem "bootsnap",     "1.24.6", require: false
 gem "rswag-api",    "2.17.0"
 gem "rswag-ui",     "2.17.0"
 
