@@ -6,11 +6,6 @@ class Api::V1::SsoController < ApplicationController
     render json: token_response(find_or_create(profile, "google"))
   end
 
-  def apple
-    profile = Sso::AppleSsoService.call(params.fetch(:id_token))
-    render json: token_response(find_or_create(profile, "apple"))
-  end
-
   private
 
   def find_or_create(profile, provider)

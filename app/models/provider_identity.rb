@@ -1,5 +1,5 @@
 class ProviderIdentity < ApplicationRecord
-  PROVIDERS = %w[google apple].freeze
+  PROVIDERS = %w[google].freeze
 
   belongs_to :user
 
