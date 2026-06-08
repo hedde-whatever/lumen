@@ -15,9 +15,9 @@ RUN bundle install --jobs 4 --retry 3
 
 COPY . .
 
-RUN chmod +x bin/docker-entrypoint-prod.sh
+RUN chmod +x bin/docker-entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["bin/docker-entrypoint-prod.sh"]
+ENTRYPOINT ["bin/docker-entrypoint.sh"]
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
