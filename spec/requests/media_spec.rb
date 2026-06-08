@@ -39,6 +39,16 @@ RSpec.describe "Media", type: :request do
       expect(json_response["url"]).to be_present
     end
 
+    it "returns 422 when the file exceeds 10 MB" do
+      oversized = fixture_file_upload(Rails.root.join("spec/fixtures/files/photo.jpg"), "image/jpeg")
+      allow(oversized).to receive(:size).and_return(11.megabytes)
+      # Stub the blob size check at the model level
+      allow_any_instance_of(ActiveStorage::Blob).to receive(:byte_size).and_return(11.megabytes)
+      post base_url, params: { file: oversized }, headers: headers
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json_response["errors"].first).to include("10 MB")
+    end
+
     it "returns 422 for a non-image file" do
       pdf = fixture_file_upload(
         Rails.root.join("spec/fixtures/files/document.pdf"),

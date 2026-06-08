@@ -7,8 +7,10 @@ class Medium < ApplicationRecord
   end
 
   ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
+  MAX_FILE_SIZE         = 10.megabytes
 
   validate :photo_content_type
+  validate :photo_file_size
 
   def presigned_url(expires_in: 518400)
     return nil unless photo.attached?
@@ -28,6 +30,13 @@ class Medium < ApplicationRecord
     return unless photo.attached?
     unless ALLOWED_CONTENT_TYPES.include?(photo.content_type)
       errors.add(:photo, "must be a JPEG, PNG, WebP, or GIF")
+    end
+  end
+
+  def photo_file_size
+    return unless photo.attached?
+    if photo.blob.byte_size > MAX_FILE_SIZE
+      errors.add(:photo, "must be smaller than 10 MB")
     end
   end
 

@@ -17,6 +17,21 @@ class Rack::Attack
     req.ip unless req.path == "/up"
   end
 
+  # Block oversized upload requests before they consume memory (10 MB limit)
+  blocklist("block/large_uploads") do |req|
+    req.path.match?(%r{/api/.*/media}) && req.post? &&
+      req.content_length.to_i > 10.megabytes
+  end
+
+  # Return JSON 413 for blocked oversized uploads
+  self.blocklisted_responder = lambda do |req|
+    [
+      413,
+      { "Content-Type" => "application/json" },
+      [ { error: "File too large. Maximum upload size is 10 MB." }.to_json ]
+    ]
+  end
+
   # Return JSON 429 instead of the default plain-text response
   self.throttled_responder = lambda do |req|
     match_data  = req.env["rack.attack.match_data"]
