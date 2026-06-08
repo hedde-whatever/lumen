@@ -39,6 +39,20 @@ RSpec.describe "Media", type: :request do
       expect(json_response["url"]).to be_present
     end
 
+    it "accepts a large image and normalizes it rather than rejecting it" do
+      large = Tempfile.new([ "large", ".jpg" ])
+      Vips::Image.black(3000, 3000).write_to_file(large.path)
+      large_upload = fixture_file_upload(large.path, "image/jpeg")
+
+      post base_url, params: { file: large_upload }, headers: headers
+      expect(response).to have_http_status(:created)
+
+      # Stored blob should be a JPEG (converted by normalizer)
+      expect(Medium.last.photo.blob.content_type).to eq("image/jpeg")
+    ensure
+      large&.close!
+    end
+
     it "returns 422 for a non-image file" do
       pdf = fixture_file_upload(
         Rails.root.join("spec/fixtures/files/document.pdf"),

@@ -17,6 +17,19 @@ class Rack::Attack
     req.ip unless req.path == "/up"
   end
 
+  # Hard cap on upload request size — rejects absurdly large payloads
+  # before libvips even sees them. Normal phone photos are under 20 MB.
+  blocklist("block/oversized_uploads") do |req|
+    req.path.match?(%r{/api/.*/media}) && req.post? &&
+      req.content_length.to_i > 50.megabytes
+  end
+
+  # Return JSON 413 for blocked oversized uploads
+  self.blocklisted_responder = lambda do |_req|
+    [ 413, { "Content-Type" => "application/json" },
+      [ { error: "Request too large." }.to_json ] ]
+  end
+
   # Return JSON 429 instead of the default plain-text response
   self.throttled_responder = lambda do |req|
     match_data  = req.env["rack.attack.match_data"]
