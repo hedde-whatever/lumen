@@ -14,3 +14,6 @@ amazon:
   bucket:            <%= ENV["S3_BUCKET_NAME"] %>
   endpoint:          <%= ENV["S3_ENDPOINT"].presence %>
   force_path_style:  <%= ENV.fetch("S3_FORCE_PATH_STYLE", "false") == "true" %>
+  http_open_timeout: 5
+  http_read_timeout: 10
+  retry_limit:       3
