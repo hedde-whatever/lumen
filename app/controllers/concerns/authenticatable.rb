@@ -1,5 +1,6 @@
 module Authenticatable
   extend ActiveSupport::Concern
+  include Clerk::Authenticatable
 
   included do
     before_action :authenticate_request!
@@ -8,17 +9,17 @@ module Authenticatable
   private
 
   def authenticate_request!
-    token = bearer_token
-    raise Errors::Unauthorized, "Missing token" if token.blank?
+    clerk_user = clerk&.user
+    unless clerk_user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
 
-    payload = JwtService.decode(token)
-    @current_user = User.find(payload[:sub])
-  rescue Errors::InvalidToken, ActiveRecord::RecordNotFound
-    render json: { error: "Unauthorized" }, status: :unauthorized
-  end
-
-  def bearer_token
-    header = request.headers["Authorization"]
-    header&.split(" ")&.last
+    @current_user = User.find_or_create_by!(clerk_id: clerk_user.id) do |u|
+      u.email = clerk_user.email_addresses.first&.email_address
+      u.name  = [ clerk_user.first_name, clerk_user.last_name ].compact.join(" ").presence ||
+                u.email&.split("@")&.first ||
+                "User"
+    end
   end
 end

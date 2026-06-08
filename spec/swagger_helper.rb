@@ -81,4 +81,24 @@ RSpec.configure do |config|
   }
 
   config.openapi_format = :yaml
+
+  # Fix lat/lng type: decimal columns serialize as strings in JSON
+  config.openapi_specs["v1/swagger.yaml"][:components][:schemas][:Event][:properties].merge!(
+    lat: { type: :string, nullable: true },
+    lng: { type: :string, nullable: true }
+  )
+end
+
+def clerk_auth(user)
+  clerk_double = double(
+    "ClerkProxy",
+    user: double(
+      "ClerkUser",
+      id:              user.clerk_id,
+      first_name:      user.name,
+      last_name:        nil,
+      email_addresses: [ double("EmailAddress", email_address: user.email) ]
+    )
+  )
+  allow_any_instance_of(ApplicationController).to receive(:clerk).and_return(clerk_double)
 end

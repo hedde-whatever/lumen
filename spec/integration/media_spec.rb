@@ -3,7 +3,8 @@ require "swagger_helper"
 RSpec.describe "Media", type: :request do
   let!(:user)         { create(:user) }
   let!(:event)        { create(:event, user: user) }
-  let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+  let(:Authorization) { "Bearer fake-clerk-token" }
+  before { clerk_auth(user) if send(:Authorization).present? }
 
   before do
     allow(S3Client).to receive(:presigned_url).and_return("http://localhost:4566/lumen-media/uploads/sample.jpg")

@@ -2,7 +2,8 @@ require "swagger_helper"
 
 RSpec.describe "Events", type: :request do
   let!(:user)         { create(:user) }
-  let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+  let(:Authorization) { "Bearer fake-clerk-token" }
+  before { clerk_auth(user) if send(:Authorization).present? }
 
   path "/api/v1/events" do
     get "List events" do
