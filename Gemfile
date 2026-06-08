@@ -6,7 +6,7 @@ gem "puma",         "8.0.2"
 gem "pg",           "1.6.3"
 gem "rack-cors",    "3.0.0"
 gem "clerk-sdk-ruby", "5.1.3", require: "clerk"
-gem "aws-sdk-s3",   "1.224.0"
+gem "aws-sdk-s3",   "1.225.0"
 gem "dotenv-rails", "3.2.0"
 gem "kaminari",     "1.2.2"
 gem "bootsnap",     "1.24.5", require: false
