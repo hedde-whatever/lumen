@@ -6,10 +6,6 @@ RSpec.describe "Media", type: :request do
   let(:Authorization) { "Bearer fake-clerk-token" }
   before { clerk_auth(user) if send(:Authorization).present? }
 
-  before do
-    allow(S3Client).to receive(:presigned_url).and_return("http://localhost:4566/lumen-media/uploads/sample.jpg")
-  end
-
   path "/api/v1/events/{event_id}/media" do
     parameter name: :event_id, in: :path, type: :integer, required: true
 
@@ -46,10 +42,6 @@ RSpec.describe "Media", type: :request do
 
       parameter name: :file, in: :formData, type: :file, required: true,
                 description: "Image or video file to upload"
-
-      before do
-        allow(S3UploadService).to receive(:upload).and_return("uploads/users/1/events/1/uuid-photo.jpg")
-      end
 
       response "201", "media uploaded" do
         schema "$ref" => "#/components/schemas/Medium"
@@ -97,8 +89,6 @@ RSpec.describe "Media", type: :request do
     delete "Delete a media record" do
       tags     "Media"
       security [ bearer: [] ]
-
-      before { allow(S3UploadService).to receive(:delete) }
 
       response "204", "media deleted" do
         let!(:medium)  { create(:medium, user: user, event: event) }

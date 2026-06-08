@@ -18,6 +18,10 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.filter_rails_from_backtrace!
   config.include FactoryBot::Syntax::Methods
+
+  config.before(:each, type: :request) do
+    ActiveStorage::Current.url_options = { host: "localhost" }
+  end
 end
 
 Shoulda::Matchers.configure do |config|

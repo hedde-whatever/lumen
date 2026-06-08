@@ -8,11 +8,11 @@ class Api::V1::EventsController < ApplicationController
                           .includes(:media)
                           .page(params[:page])
                           .per(params[:per_page] || 50)
-    render json: events.as_json(include: { media: { only: [ :id, :path, :created_at ] } })
+    render json: events.as_json(include: { media: { only: [ :id, :created_at ] } })
   end
 
   def show
-    render json: @event.as_json(include: { media: { only: [ :id, :path, :created_at ] } })
+    render json: @event.as_json(include: { media: { only: [ :id, :created_at ] } })
   end
 
   def create

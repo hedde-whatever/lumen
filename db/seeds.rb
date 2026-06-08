@@ -1,9 +1,5 @@
 # Idempotent — safe to run on every container start.
-# Creates two demo users with known credentials, a handful of concerts each, and 2 seed images per concert.
-
-SeedFile = Struct.new(:path, :original_filename, :content_type) do
-  def read = File.binread(path)
-end
+# Creates two demo users, a handful of concerts each, and 2 seed images per concert.
 
 puts "Seeding demo users..."
 
@@ -120,9 +116,12 @@ Event.all.each do |event|
   next if event.media.exists?
 
   2.times do |i|
-    file = SeedFile.new(image_path, "photo#{i + 1}.jpg", "image/jpeg")
-    key  = S3UploadService.upload(file: file, user_id: event.user_id, event_id: event.id)
-    event.media.create!(user: event.user, path: key)
+    medium = event.media.create!(user: event.user)
+    medium.photo.attach(
+      io:           File.open(image_path),
+      filename:     "photo#{i + 1}.jpg",
+      content_type: "image/jpeg"
+    )
   end
 end
 
