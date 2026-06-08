@@ -46,5 +46,8 @@ Rails.application.configure do
   # Remove Clerk middleware in tests — auth is stubbed at the controller level.
   config.middleware.delete Clerk::Rack::Middleware
 
+  # Rate limiting is disabled globally in tests via Rack::Attack.enabled = false
+  # (set in config/initializers/rack_attack.rb). Enable per-spec where needed.
+
   config.active_storage.service = :test
 end
