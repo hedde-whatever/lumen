@@ -9,12 +9,12 @@ puts "Seeding demo users..."
 
 alice = User.find_or_create_by!(email: "alice@lumen.dev") do |u|
   u.name     = "Alice"
-  u.password = "password123"
+  u.clerk_id = "seed_alice"
 end
 
 bob = User.find_or_create_by!(email: "bob@lumen.dev") do |u|
   u.name     = "Bob"
-  u.password = "password123"
+  u.clerk_id = "seed_bob"
 end
 
 puts "Seeding concerts..."
@@ -126,6 +126,4 @@ Event.all.each do |event|
   end
 end
 
-puts "Done. Demo accounts:"
-puts "  alice@lumen.dev / password123"
-puts "  bob@lumen.dev   / password123"
+puts "Done. Seeded alice@lumen.dev and bob@lumen.dev."
