@@ -57,8 +57,7 @@ RSpec.configure do |config|
             type: :object,
             properties: {
               id:         { type: :integer },
-              path:       { type: :string, description: "S3 object key" },
-              url:        { type: :string, description: "Presigned S3 URL (expires in 6 days)" },
+              url:        { type: :string, nullable: true, description: "Presigned S3 URL (expires in 6 days)" },
               created_at: { type: :string, format: :"date-time" }
             }
           },

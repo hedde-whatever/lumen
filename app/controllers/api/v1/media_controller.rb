@@ -16,18 +16,13 @@ class Api::V1::MediaController < ApplicationController
       return
     end
 
-    file = params.require(:file)
-    key  = S3UploadService.upload(
-      file:     file,
-      user_id:  @current_user.id,
-      event_id: @event.id
-    )
-    medium = @event.media.create!(user: @current_user, path: key)
+    file   = params.require(:file)
+    medium = @event.media.create!(user: @current_user)
+    medium.photo.attach(file)
     render json: medium_json(medium), status: :created
   end
 
   def destroy
-    S3UploadService.delete(key: @medium.path)
     @medium.destroy
     head :no_content
   end
@@ -43,6 +38,6 @@ class Api::V1::MediaController < ApplicationController
   end
 
   def medium_json(medium)
-    medium.as_json(only: [ :id, :path, :created_at ]).merge(url: medium.presigned_url)
+    medium.as_json(only: [ :id, :created_at ]).merge(url: medium.presigned_url)
   end
 end

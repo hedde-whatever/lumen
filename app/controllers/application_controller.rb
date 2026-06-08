@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::API
   include Clerk::Authenticatable
+  include ActiveStorage::SetCurrent
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   rescue_from Errors::Unauthorized,         with: :render_unauthorized

@@ -45,4 +45,6 @@ Rails.application.configure do
 
   # Remove Clerk middleware in tests — auth is stubbed at the controller level.
   config.middleware.delete Clerk::Rack::Middleware
+
+  config.active_storage.service = :test
 end
