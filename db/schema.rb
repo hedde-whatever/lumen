@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_195436) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_08_181914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,6 +44,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_195436) do
     t.index ["user_id"], name: "index_media_on_user_id"
   end
 
+  create_table "provider_identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["provider", "uid"], name: "index_provider_identities_on_provider_and_uid", unique: true
+    t.index ["user_id"], name: "index_provider_identities_on_user_id"
+  end
+
   create_table "refresh_tokens", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
@@ -59,7 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_195436) do
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "name", null: false
-    t.string "password_digest", null: false
+    t.string "password_digest"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
@@ -67,5 +77,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_195436) do
   add_foreign_key "events", "users"
   add_foreign_key "media", "events"
   add_foreign_key "media", "users"
+  add_foreign_key "provider_identities", "users"
   add_foreign_key "refresh_tokens", "users"
 end

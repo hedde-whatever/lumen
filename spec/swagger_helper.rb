@@ -73,6 +73,14 @@ RSpec.configure do |config|
             properties: {
               errors: { type: :array, items: { type: :string } }
             }
+          },
+          AuthResponse: {
+            type: :object,
+            properties: {
+              access_token:  { type: :string },
+              refresh_token: { type: :string },
+              user:          { "$ref" => "#/components/schemas/User" }
+            }
           }
         }
       },

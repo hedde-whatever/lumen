@@ -13,8 +13,8 @@ RSpec.describe "Media", type: :request do
       allow(S3Client).to receive(:presigned_url).and_return("http://localhost:4566/bucket/key")
       get base_url, headers: headers
       expect(response).to have_http_status(:ok)
-      expect(json_response.length).to eq(2)
-      expect(json_response.first).to include("url")
+      expect(json_response["items"].length).to eq(2)
+      expect(json_response["items"].first).to include("url")
     end
   end
 

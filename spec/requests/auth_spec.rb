@@ -9,7 +9,7 @@ RSpec.describe "Auth", type: :request do
     it "creates a user and returns a token" do
       post "/api/v1/auth/register", params: valid_params
       expect(response).to have_http_status(:created)
-      expect(json_response).to include("token", "user")
+      expect(json_response).to include("access_token", "refresh_token", "user")
       expect(json_response["user"]["email"]).to eq("alice@example.com")
     end
 
@@ -26,7 +26,7 @@ RSpec.describe "Auth", type: :request do
     it "returns a token for valid credentials" do
       post "/api/v1/auth/login", params: { email: "bob@example.com", password: "mypassword" }
       expect(response).to have_http_status(:ok)
-      expect(json_response).to include("token")
+      expect(json_response).to include("access_token", "refresh_token")
     end
 
     it "returns 401 for wrong password" do
