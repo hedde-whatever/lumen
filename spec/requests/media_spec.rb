@@ -5,6 +5,7 @@ RSpec.describe "Media", type: :request do
   let!(:event)   { create(:event, user: user) }
   let(:headers)  { auth_headers(user) }
   let(:base_url) { "/api/v1/events/#{event.id}/media" }
+  let(:jpeg) { fixture_file_upload(Rails.root.join("spec/fixtures/files/photo.jpg"), "image/jpeg") }
 
   describe "GET /api/v1/events/:event_id/media" do
     before { create_list(:medium, 2, user: user, event: event) }
@@ -13,7 +14,7 @@ RSpec.describe "Media", type: :request do
       get base_url, headers: headers
       expect(response).to have_http_status(:ok)
       expect(json_response["items"].length).to eq(2)
-      expect(json_response["items"].first).to include("url")
+      expect(json_response["items"].first).to include("url", "thumbnail_url")
       expect(json_response["limit"]).to eq(10)
       expect(json_response["remaining"]).to eq(8)
     end
@@ -31,35 +32,38 @@ RSpec.describe "Media", type: :request do
   end
 
   describe "POST /api/v1/events/:event_id/media" do
-    let(:file) do
-      fixture_file_upload(
-        Rails.root.join("spec/fixtures/files/photo.jpg"),
-        "image/jpeg"
-      )
+    it "uploads a JPEG and returns url and thumbnail_url" do
+      post base_url, params: { file: jpeg }, headers: headers
+      expect(response).to have_http_status(:created)
+      expect(json_response).to include("url", "thumbnail_url")
+      expect(json_response["url"]).to be_present
     end
 
-    it "uploads a file and creates a media record" do
-      post base_url, params: { file: file }, headers: headers
-      expect(response).to have_http_status(:created)
-      expect(json_response).to include("url")
-      expect(json_response["url"]).to be_present
+    it "returns 422 for a non-image file" do
+      pdf = fixture_file_upload(
+        Rails.root.join("spec/fixtures/files/document.pdf"),
+        "application/pdf"
+      )
+      post base_url, params: { file: pdf }, headers: headers
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json_response["errors"].first).to include("JPEG, PNG, WebP, or GIF")
     end
 
     it "returns 422 when the photo limit is reached" do
       create_list(:medium, 10, user: user, event: event)
-      post base_url, params: { file: file }, headers: headers
+      post base_url, params: { file: jpeg }, headers: headers
       expect(response).to have_http_status(:unprocessable_entity)
       expect(json_response["error"]).to include("limit")
     end
 
     it "returns 404 for another user's event" do
       other_event = create(:event)
-      post "/api/v1/events/#{other_event.id}/media", params: { file: file }, headers: headers
+      post "/api/v1/events/#{other_event.id}/media", params: { file: jpeg }, headers: headers
       expect(response).to have_http_status(:not_found)
     end
 
     it "returns 401 without a token" do
-      post base_url, params: { file: file }
+      post base_url, params: { file: jpeg }
       expect(response).to have_http_status(:unauthorized)
     end
   end

@@ -56,9 +56,10 @@ RSpec.configure do |config|
           Medium: {
             type: :object,
             properties: {
-              id:         { type: :integer },
-              url:        { type: :string, nullable: true, description: "Presigned S3 URL (expires in 6 days)" },
-              created_at: { type: :string, format: :"date-time" }
+              id:            { type: :integer },
+              url:           { type: :string, nullable: true, description: "Presigned URL for the original image (expires in 6 days)" },
+              thumbnail_url: { type: :string, nullable: true, description: "Presigned URL for a 400px thumbnail (expires in 6 days)" },
+              created_at:    { type: :string, format: :"date-time" }
             }
           },
           Error: {

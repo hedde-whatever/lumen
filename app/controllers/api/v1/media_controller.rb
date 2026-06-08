@@ -17,9 +17,15 @@ class Api::V1::MediaController < ApplicationController
     end
 
     file   = params.require(:file)
-    medium = @event.media.create!(user: @current_user)
+    medium = @event.media.build(user: @current_user)
     medium.photo.attach(file)
-    render json: medium_json(medium), status: :created
+
+    if medium.save
+      render json: medium_json(medium), status: :created
+    else
+      medium.photo.purge if medium.photo.attached?
+      render json: { errors: medium.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def destroy
@@ -38,6 +44,9 @@ class Api::V1::MediaController < ApplicationController
   end
 
   def medium_json(medium)
-    medium.as_json(only: [ :id, :created_at ]).merge(url: medium.presigned_url)
+    medium.as_json(only: [ :id, :created_at ]).merge(
+      url:           medium.presigned_url,
+      thumbnail_url: medium.thumbnail_url
+    )
   end
 end

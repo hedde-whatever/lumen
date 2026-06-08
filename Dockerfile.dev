@@ -5,6 +5,7 @@ RUN apt-get update -qq && \
       build-essential \
       libpq-dev \
       postgresql-client \
+      libvips-dev \
       curl && \
     rm -rf /var/lib/apt/lists/*
 
