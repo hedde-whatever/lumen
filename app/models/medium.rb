@@ -2,8 +2,19 @@ class Medium < ApplicationRecord
   belongs_to :user
   belongs_to :event
 
-  has_one_attached :photo, dependent: :purge do |attachable|
+  has_one_attached :photo, dependent: :detach do |attachable|
     attachable.variant :thumbnail, resize_to_limit: [ 400, 400 ]
+  end
+
+  before_destroy :cache_blob
+  after_destroy  :purge_cached_blob
+
+  def cache_blob
+    @cached_blob = photo.blob if photo.attached?
+  end
+
+  def purge_cached_blob
+    @cached_blob&.purge
   end
 
   ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
