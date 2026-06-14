@@ -17,3 +17,5 @@ amazon:
   http_open_timeout: 5
   http_read_timeout: 10
   retry_limit:       3
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
