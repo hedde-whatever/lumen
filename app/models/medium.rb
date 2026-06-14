@@ -14,7 +14,7 @@ class Medium < ApplicationRecord
   end
 
   def purge_cached_blob
-    @cached_blob&.purge
+    @cached_blob&.purge rescue Aws::S3::Errors::NoSuchKey
   end
 
   ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze

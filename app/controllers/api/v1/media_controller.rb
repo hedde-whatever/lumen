@@ -37,7 +37,7 @@ class Api::V1::MediaController < ApplicationController
     blob = @medium.photo.blob if @medium.photo.attached?
     @medium.photo.detach
     @medium.destroy
-    blob&.purge
+    blob&.purge rescue Aws::S3::Errors::NoSuchKey
     head :no_content
   end
 
