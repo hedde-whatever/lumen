@@ -1,8 +1,8 @@
 require "image_processing/vips"
 
 class ImageNormalizer
-  MAX_DIMENSION = 2000
-  JPEG_QUALITY  = 85
+  MAX_DIMENSION = 3000
+  JPEG_QUALITY  = 90
 
   # Resizes the image to fit within MAX_DIMENSION x MAX_DIMENSION and
   # converts it to JPEG. Returns a hash suitable for ActiveStorage#attach.
