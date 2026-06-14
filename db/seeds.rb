@@ -12,7 +12,7 @@ puts "Seeding concerts..."
 
 concerts = [
   {
-    name:         "Radiohead — In Rainbows Tour",
+    name:         "Radiohead",
     date:         "2008-05-26",
     country_name: "Denmark",
     country_code: "DK",
@@ -51,7 +51,7 @@ concerts = [
     note:         "Skinny Love still hits different live."
   },
   {
-    name:         "Kendrick Lamar — The Big Steppers Tour",
+    name:         "Kendrick Lamar",
     date:         "2022-11-17",
     country_name: "Sweden",
     country_code: "SE",
@@ -77,7 +77,7 @@ concerts = [
     note:         "The Hope Six Demolition Project tour. Raw and political."
   },
   {
-    name:         "Massive Attack — Mezzanine XX1 Tour",
+    name:         "Massive Attack",
     date:         "2019-04-13",
     country_name: "Germany",
     country_code: "DE",
