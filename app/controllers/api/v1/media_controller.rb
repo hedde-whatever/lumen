@@ -34,6 +34,7 @@ class Api::V1::MediaController < ApplicationController
   end
 
   def destroy
+    @medium.photo.purge if @medium.photo.attached?
     @medium.destroy
     head :no_content
   end

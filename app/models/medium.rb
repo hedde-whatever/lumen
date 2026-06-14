@@ -6,17 +6,24 @@ class Medium < ApplicationRecord
     attachable.variant :thumbnail, resize_to_limit: [ 400, 400 ]
   end
 
-  ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
+  before_destroy :purge_photo
+
+  def purge_photo
+    photo.purge if photo.attached?
+  end
+
+  ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
+  URL_EXPIRY = 518400
 
   validate :photo_content_type
 
-  def presigned_url(expires_in: 518400)
+  def presigned_url(expires_in: URL_EXPIRY)
     return nil unless photo.attached?
     url = photo.url(expires_in: expires_in)
     rewrite_localstack_url(url)
   end
 
-  def thumbnail_url(expires_in: 518400)
+  def thumbnail_url(expires_in: URL_EXPIRY)
     return nil unless photo.attached?
     url = photo.variant(:thumbnail).processed.url(expires_in: expires_in)
     rewrite_localstack_url(url)
@@ -27,7 +34,7 @@ class Medium < ApplicationRecord
   def photo_content_type
     return unless photo.attached?
     unless ALLOWED_CONTENT_TYPES.include?(photo.content_type)
-      errors.add(:photo, "must be a JPEG, PNG, WebP, or GIF")
+      errors.add(:photo, "must be a JPEG, PNG, or WebP")
     end
   end
 
