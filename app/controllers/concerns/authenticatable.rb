@@ -15,11 +15,14 @@ module Authenticatable
       return
     end
 
-    @current_user = User.find_or_create_by!(clerk_id: clerk_user.id) do |u|
-      u.email = clerk_user.email_addresses.first&.email_address
-      u.name  = [ clerk_user.first_name, clerk_user.last_name ].compact.join(" ").presence ||
-                u.email&.split("@")&.first ||
-                "User"
+    @current_user = User.find_by(clerk_id: clerk_user.id) || begin
+      email = clerk_user.email_addresses.first&.email_address
+      name  = [ clerk_user.first_name, clerk_user.last_name ].compact.join(" ").presence ||
+              email&.split("@")&.first ||
+              "User"
+      User.create!(clerk_id: clerk_user.id, email: email, name: name)
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+      User.find_by!(clerk_id: clerk_user.id)
     end
   end
 end
