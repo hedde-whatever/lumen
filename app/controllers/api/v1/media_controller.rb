@@ -34,8 +34,10 @@ class Api::V1::MediaController < ApplicationController
   end
 
   def destroy
-    @medium.photo.purge if @medium.photo.attached?
+    blob = @medium.photo.blob if @medium.photo.attached?
+    @medium.photo.detach
     @medium.destroy
+    blob&.purge
     head :no_content
   end
 

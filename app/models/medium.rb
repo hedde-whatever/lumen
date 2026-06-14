@@ -6,12 +6,6 @@ class Medium < ApplicationRecord
     attachable.variant :thumbnail, resize_to_limit: [ 400, 400 ]
   end
 
-  before_destroy :purge_photo
-
-  def purge_photo
-    photo.purge if photo.attached?
-  end
-
   ALLOWED_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
   URL_EXPIRY = 518400
 
