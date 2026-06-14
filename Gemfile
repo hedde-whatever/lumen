@@ -13,6 +13,7 @@ gem "ruby-vips",        "2.3.0"
 gem "dotenv-rails", "3.2.0"
 gem "kaminari",     "1.2.2"
 gem "bootsnap",     "1.24.6", require: false
+gem "lograge",      "0.14.0"
 gem "rswag-api",    "2.17.0"
 gem "rswag-ui",     "2.17.0"
 

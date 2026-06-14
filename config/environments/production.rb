@@ -34,6 +34,13 @@ Rails.application.configure do
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
+  # Structured JSON logging for Railway log level filtering.
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Json.new
+  config.lograge.custom_options = lambda do |event|
+    { level: event.payload[:exception] ? "ERROR" : "INFO" }
+  end
+
   # Prevent health checks from clogging up the logs.
   config.silence_healthcheck_path = "/up"
 
