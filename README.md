@@ -1,6 +1,6 @@
 # Lumen API
 
-Backend API for Lumen — a concert-logging app ("Strava for music"). Built with Ruby on Rails, PostgreSQL, and S3 for media storage.
+Backend API for Lumen — a concert-logging app ("Strava for music"). Built with Ruby on Rails, PostgreSQL, Clerk for authentication, and Cloudflare R2 for media storage.
 
 ---
 
@@ -20,7 +20,7 @@ You don't need to know Ruby or Rails. You just need Docker.
 git clone git@github.com:Djursing/lumen.git
 cd lumen
 
-# 2. Place the .env file sent you in the root of the project
+# 2. Place the .env file in the root of the project
 #    It should sit next to docker-compose.yml
 
 # 3. Build and start everything
@@ -45,19 +45,19 @@ curl http://localhost:3000/up
 # → "OK"
 ```
 
-### Demo accounts
+### Authentication
 
-The database is pre-seeded with two accounts, several concerts each, and 2 photos per concert already uploaded to LocalStack. Use these to log in straight away:
+This API uses [Clerk](https://clerk.com) for authentication. There are no login/register endpoints — authentication is handled entirely by Clerk on the frontend.
 
-| Email | Password |
-|-------|----------|
-| alice@lumen.dev | password123 |
-| bob@lumen.dev | password123 |
+To make authenticated requests locally:
+
+1. Sign in via the frontend app to get a Clerk session
+2. Retrieve your session token from the Clerk dashboard or via `clerk.session.getToken()` in the browser console
+3. Pass it as a Bearer token:
 
 ```bash
-curl -s -X POST http://localhost:3000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"alice@lumen.dev","password":"password123"}' | jq .token
+curl -s http://localhost:3000/api/v1/auth/me \
+  -H "Authorization: Bearer <your-clerk-token>"
 ```
 
 ### Stopping
@@ -80,8 +80,8 @@ Open **http://localhost:3000/api-docs** in your browser once the stack is runnin
 
 You'll see all available endpoints with full request/response contracts. To try authenticated endpoints:
 
-1. Call `POST /api/v1/auth/register` or `POST /api/v1/auth/login` to get a token
-2. Click the **Authorize** button (top right of the Swagger UI)
+1. Retrieve a Clerk token (see Authentication section above)
+2. Click the **Authorize** button (top right of Swagger UI)
 3. Paste the token and click Authorize
 4. All subsequent requests in the UI will include the Bearer token
 
@@ -99,24 +99,24 @@ All endpoints (except `/up`) live under `/api/v1/`.
 
 ## Media uploads and LocalStack
 
-In local development, file uploads (concert photos/videos) go to **LocalStack** — a local emulator of AWS S3. There is no real S3 bucket involved; everything stays on your machine.
+In local development, file uploads go to **LocalStack** — a local emulator of AWS S3. There is no real S3 bucket involved; everything stays on your machine.
 
-When you upload a file via `POST /api/v1/events/:id/media`, the API stores it in LocalStack and returns the new media record:
+When you upload a file via `POST /api/v1/events/:id/media`, the API normalizes it (resizes to max 3000×3000px, converts to JPEG) and returns the new media record:
 
 ```json
 {
   "id": 1,
-  "path": "uploads/users/1/events/3/uuid-photo.jpg",
-  "url": "http://localhost:4567/lumen-media/uploads/users/1/events/3/uuid-photo.jpg?...",
+  "url": "http://localhost:4567/lumen-media/...",
+  "thumbnail_url": "http://localhost:4567/lumen-media/...",
   "created_at": "2026-05-24T12:00:00.000Z"
 }
 ```
 
-Fetching all media for an event via `GET /api/v1/events/:id/media` returns an envelope with the limit built in — use this to decide whether to show the upload button:
+Fetching all media for an event via `GET /api/v1/events/:id/media` returns:
 
 ```json
 {
-  "items": [ { "id": 1, "path": "...", "url": "...", "created_at": "..." } ],
+  "items": [ { "id": 1, "url": "...", "thumbnail_url": "...", "created_at": "..." } ],
   "limit": 10,
   "remaining": 9
 }
@@ -124,7 +124,7 @@ Fetching all media for an event via `GET /api/v1/events/:id/media` returns an en
 
 Each event can hold a maximum of **10 photos**. Uploading when the limit is reached returns `422`.
 
-The `url` field is a time-limited link (6 days) that points to `localhost:4567`. You can load it directly in an `<Image>` tag or `fetch()` call — no extra configuration needed.
+URLs are time-limited presigned links (6 days). In development they point to `localhost:4567`.
 
 > **Note:** LocalStack data is stored in a Docker volume. It persists across restarts but is wiped when you run `docker compose down -v`.
 
@@ -134,65 +134,56 @@ The `url` field is a time-limited link (6 days) that points to `localhost:4567`.
 
 ```bash
 git pull
-docker compose up --build   # rebuild picks up any new gems or migrations
+docker compose up --build
 ```
 
-The entrypoint automatically runs database migrations on startup, so you never need to run them manually.
+The entrypoint automatically runs database migrations on startup.
 
 ---
 
 ## Live code reloading
 
-The app container mounts the source code directly from your machine. If you're making backend changes yourself, edits to `.rb` files are picked up on the next request — no restart or rebuild required.
+The app container mounts the source code directly from your machine. Edits to `.rb` files are picked up on the next request — no restart or rebuild required.
 
 ---
 
 ## Environment variables
 
-The `.env` file Oliver provides contains everything needed. See `.env.example` in the repo for the full list of variables and what they do. Never commit your `.env` file — it's gitignored.
+See `.env.example` for the full list. Never commit your `.env` file — it's gitignored.
+
+Key variables:
+
+| Variable | Description |
+|----------|-------------|
+| `CLERK_SECRET_KEY` | Clerk secret key (`sk_test_...` for dev, `sk_live_...` for prod) |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed frontend origins (production only) |
+| `AWS_ACCESS_KEY_ID` | R2 access key |
+| `AWS_SECRET_ACCESS_KEY` | R2 secret key |
+| `S3_BUCKET_NAME` | R2 bucket name |
+| `S3_ENDPOINT` | R2 endpoint URL |
 
 ---
 
-## Production deployment (Fly.io + Cloudflare R2)
+## Production deployment (Railway)
 
-### First-time setup
+The app is deployed on [Railway](https://railway.app) with three services: Rails API, Postgres, and the frontend.
 
-**1. Create a Cloudflare R2 bucket**
-- Go to [dash.cloudflare.com](https://dash.cloudflare.com) → R2 → Create bucket
-- Name it `lumen-media` (or update `S3_BUCKET_NAME` below)
-- Note your **Account ID** from the R2 overview page
+### Rails API service environment variables
 
-**2. Create an R2 API token**
-- R2 → Manage API Tokens → Create API token
-- Permissions: **Object Read & Write** on your bucket
-
-**3. Set Fly secrets**
-```bash
-fly secrets set \
-  AWS_ACCESS_KEY_ID=<r2-access-key-id> \
-  AWS_SECRET_ACCESS_KEY=<r2-secret-access-key> \
-  AWS_REGION=auto \
-  S3_BUCKET_NAME=lumen-media \
-  S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com \
-  S3_FORCE_PATH_STYLE=true \
-  DB_HOST=<fly-postgres-host> \
-  DB_USERNAME=<db-user> \
-  DB_PASSWORD=<db-password> \
-  DB_NAME=lumen_production \
-  SECRET_KEY_BASE=$(openssl rand -hex 64) \
-  JWT_SECRET=$(openssl rand -hex 32) \
-  JWT_EXPIRY_HOURS=0.25 \
-  ALLOWED_ORIGINS=https://your-frontend-domain.com
+```
+CLERK_SECRET_KEY=sk_live_...
+ALLOWED_ORIGINS=https://your-frontend.up.railway.app
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=auto
+S3_BUCKET_NAME=lumen-media
+S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+S3_FORCE_PATH_STYLE=true
+DATABASE_URL=<set automatically by Railway Postgres>
+SECRET_KEY_BASE=<openssl rand -hex 64>
+WEB_CONCURRENCY=1
 ```
 
-**4. Deploy**
-```bash
-fly deploy
-```
+### Deploys
 
-### Subsequent deploys
-```bash
-fly deploy
-```
-
-Migrations run automatically on startup — same as local dev.
+Railway deploys automatically on push to `main`.
