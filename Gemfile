@@ -29,7 +29,7 @@ group :development, :test do
   gem "factory_bot_rails",      "6.5.1"
   gem "faker",                  "3.8.0"
   gem "rswag-specs",            "2.17.0"
-  gem "brakeman",               "8.0.4",  require: false
+  gem "brakeman",               "8.0.5",  require: false
   gem "bundler-audit",          "0.9.3",  require: false
   gem "rubocop-rails-omakase",  "1.1.0",  require: false
 end
