@@ -17,7 +17,7 @@ gem "lograge",      "0.14.0"
 gem "tzinfo-data", platforms: %i[windows jruby]
 
 group :development do
-  gem "solargraph",  "0.59.2", require: false
+  gem "solargraph",  "0.60.2", require: false
   gem "dotenv-rails", "3.2.0"
   gem "rswag-api",   "2.17.0"
   gem "rswag-ui",    "2.17.0"
