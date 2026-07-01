@@ -30,19 +30,28 @@ class Medium < ApplicationRecord
 
   def thumbnail_url(expires_in: URL_EXPIRY)
     return nil unless photo.attached?
-    url = with_variant_lock { photo.variant(:thumbnail) }.processed.url(expires_in: expires_in)
+    url = with_variant_lock { photo.variant(:thumbnail).processed }.url(expires_in: expires_in)
     rewrite_localstack_url(url)
   end
 
   private
 
+  # Session-scoped (not transaction-scoped) on purpose: ActiveStorage's own
+  # variant-creation path relies on a top-level transaction to fire its
+  # after_commit upload callback while the transformed image's tempfile is
+  # still open. Wrapping that in an outer transaction here would defer the
+  # callback until *this* transaction commits, by which point the tempfile
+  # has already been cleaned up, breaking the upload. A session-level lock
+  # avoids opening any extra transaction around it.
   def with_variant_lock
-    ActiveRecord::Base.transaction do
-      ActiveRecord::Base.connection.execute(
-        ActiveRecord::Base.sanitize_sql(["SELECT pg_advisory_xact_lock(?)", photo.blob_id])
-      )
-      yield
-    end
+    connection = ActiveRecord::Base.connection
+    lock_key = ActiveRecord::Base.sanitize_sql(["SELECT pg_advisory_lock(?)", photo.blob_id])
+    unlock_key = ActiveRecord::Base.sanitize_sql(["SELECT pg_advisory_unlock(?)", photo.blob_id])
+
+    connection.execute(lock_key)
+    yield
+  ensure
+    connection.execute(unlock_key) if connection
   end
 
   def photo_content_type
