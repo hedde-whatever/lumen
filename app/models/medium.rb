@@ -30,11 +30,20 @@ class Medium < ApplicationRecord
 
   def thumbnail_url(expires_in: URL_EXPIRY)
     return nil unless photo.attached?
-    url = photo.variant(:thumbnail).processed.url(expires_in: expires_in)
+    url = with_variant_lock { photo.variant(:thumbnail) }.processed.url(expires_in: expires_in)
     rewrite_localstack_url(url)
   end
 
   private
+
+  def with_variant_lock
+    ActiveRecord::Base.transaction do
+      ActiveRecord::Base.connection.execute(
+        ActiveRecord::Base.sanitize_sql(["SELECT pg_advisory_xact_lock(?)", photo.blob_id])
+      )
+      yield
+    end
+  end
 
   def photo_content_type
     return unless photo.attached?
