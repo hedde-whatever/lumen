@@ -26,13 +26,13 @@ RSpec.describe ImageNormalizer do
       file.close!
     end
 
-    it "resizes images larger than 2000px to fit within 2000x2000" do
-      upload, file = build_jpeg(4000, 3000)
+    it "resizes images larger than 3000px to fit within 3000x3000" do
+      upload, file = build_jpeg(4000, 3500)
       result = ImageNormalizer.call(upload)
 
       image = Vips::Image.new_from_file(result[:io].path)
-      expect(image.width).to be <= 2000
-      expect(image.height).to be <= 2000
+      expect(image.width).to be <= 3000
+      expect(image.height).to be <= 3000
     ensure
       file.close!
     end
@@ -47,7 +47,7 @@ RSpec.describe ImageNormalizer do
       file.close!
     end
 
-    it "does not upscale images smaller than 2000px" do
+    it "does not upscale images smaller than 3000px" do
       upload, file = build_jpeg(800, 600)
       result = ImageNormalizer.call(upload)
 
