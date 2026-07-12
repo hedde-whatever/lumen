@@ -12,7 +12,7 @@ gem "image_processing", "2.0.2"
 gem "ruby-vips",        "2.3.0"
 gem "kaminari",     "1.2.2"
 gem "bootsnap",     "1.24.6", require: false
-gem "lograge",      "0.14.0"
+gem "lograge",      "0.15.0"
 
 gem "tzinfo-data", platforms: %i[windows jruby]
 
